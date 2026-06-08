@@ -1,18 +1,40 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import WelcomeView from './WelcomeView';
 import ChatArea from './ChatArea';
-import logoImg from './logo.jpg';
+import { FaMicrophone, FaBars } from 'react-icons/fa';
+import { IoSend, IoChevronDown } from 'react-icons/io5';
 
-const MainPanel = ({ viewState, setViewState, messages, setMessages, setHistory, isSidebarOpen, setIsSidebarOpen }) => {
+const MainPanel = ({ messages = [], setMessages, setHistory, isSidebarOpen, setIsSidebarOpen }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState('');
   const [selectedOption, setSelectedOption] = useState('English to Garhwali');
+  const [subGreeting, setSubGreeting] = useState('How can I help you today?');
 
-  const handleStartChat = (option) => {
-    setSelectedOption(option);
-    setViewState('chatting');
-  };
+  const dynamicPhrases = [
+    'How can I help you today?',
+    'What would you like to translate or discover today?',
+    'Ask me anything in Garhwali or English.',
+    'Let’s craft, translate, or learn something new today.',
+    'Need help with vocabulary, grammar, or regional phrasing?',
+    'Explore the depth of the Garhwali language with me.',
+    'Tell me what you want to communicate, and let’s translate it.',
+    'Looking to convert expressions or learn idioms? Type away.',
+    'I’m ready. What are we translating or exploring right now?',
+    'Type a phrase here to see its local dialect equivalent.',
+    'Let’s practice conversations or build clear vocabulary lists.',
+    'Curious about a specific word or regional sentence pattern?',
+    'What ideas can I help you write down or translate today?',
+    'Bring your text or queries; let’s map them out beautifully.',
+    'Ready for your next linguistic translation. What have you got?'
+  ];
+
+  const safeMessages = Array.isArray(messages) ? messages : [];
+
+  useEffect(() => {
+    const randomPhrase = dynamicPhrases[Math.floor(Math.random() * dynamicPhrases.length)];
+    setSubGreeting(randomPhrase);
+  }, [safeMessages.length]);
 
   const handleSendMessage = () => {
     if (inputText.trim() === '') return;
@@ -24,18 +46,23 @@ const MainPanel = ({ viewState, setViewState, messages, setMessages, setHistory,
       mode: selectedOption
     };
 
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    const updatedMessages = [...safeMessages, userMessage];
+    if (typeof setMessages === 'function') {
+      setMessages(updatedMessages);
+    }
     setInputText('');
     setIsLoading(true);
 
-    setHistory(prev => {
-      const summaryText = inputText.length > 28 ? `${inputText.substring(0, 28)}...` : inputText;
-      if (!prev.some(item => item.text === summaryText)) {
-        return [{ id: Date.now().toString(), text: summaryText }, ...prev];
-      }
-      return prev;
-    });
+    if (typeof setHistory === 'function') {
+      setHistory(prev => {
+        const safePrev = Array.isArray(prev) ? prev : [];
+        const summaryText = inputText.length > 28 ? `${inputText.substring(0, 28)}...` : inputText;
+        if (!safePrev.some(item => item.text === summaryText)) {
+          return [{ id: Date.now().toString(), text: summaryText }, ...safePrev];
+        }
+        return safePrev;
+      });
+    }
 
     setTimeout(() => {
       const botMessage = {
@@ -43,7 +70,9 @@ const MainPanel = ({ viewState, setViewState, messages, setMessages, setHistory,
         sender: 'bot',
         text: `This is a simulated AI response for your "${selectedOption}" request: "${userMessage.text}"`
       };
-      setMessages([...updatedMessages, botMessage]);
+      if (typeof setMessages === 'function') {
+        setMessages([...updatedMessages, botMessage]);
+      }
       setIsLoading(false);
     }, 1500);
   };
@@ -55,160 +84,137 @@ const MainPanel = ({ viewState, setViewState, messages, setMessages, setHistory,
     }
   };
 
-  return (
-    <div className="flex-1 h-full flex flex-col relative bg-[#070b12] overflow-hidden">
-      
-      {/* Dynamic Background Controller with Enhanced Brightness Filter */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <AnimatePresence mode="wait">
-          {viewState === 'welcome' ? (
-            /* Home Screen Layout: High-Visibility Asymmetric Branding */
-            <motion.div 
-              key="welcome-bg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-y-0 right-0 w-[45%] hidden md:flex items-center justify-end pr-6"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#070b12] via-[#070b12]/10 to-transparent z-10" />
-              <img 
-                src={logoImg} 
-                alt="Mi-Garhwali Branding" 
-                className="h-[80%] max-h-[580px] object-contain opacity-[0.45] filter brightness-125 saturate-150 drop-shadow-[0_0_50px_rgba(0,196,141,0.15)] select-none"
-              />
-            </motion.div>
-          ) : (
-            /* Chat Interface Layout: Immersive Interactive Cyber Matrix Grid */
-            <motion.div 
-              key="chat-bg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 w-full h-full flex items-center justify-center"
-            >
-              {/* Premium Cyber Dot-Matrix Overlay */}
-              <div 
-                className="absolute inset-0 opacity-[0.08] filter invert brightness-200" 
-                style={{ 
-                  backgroundImage: 'radial-gradient(#00c48d 1px, transparent 1px)', 
-                  backgroundSize: '24px 24px' 
-                }} 
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#070b12] via-transparent to-[#070b12]" />
-              
-              {/* Central Premium Ambient Watermark Layer */}
-              <img 
-                src={logoImg} 
-                alt="" 
-                className="w-[55%] max-w-xl object-contain opacity-[0.12] filter brightness-110 saturate-125 blur-[0.5px] select-none"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Modern High-End Glassmorphism Navbar Track */}
-      <header className="w-full h-16 border-b border-slate-900/60 bg-[#0c1220]/30 backdrop-blur-xl flex items-center justify-between px-6 z-20 shrink-0 box-border">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="px-3.5 py-2 rounded-xl bg-slate-950/40 hover:bg-[#00c48d] hover:text-slate-950 border border-slate-800/40 text-slate-300 transition-all text-xs font-bold tracking-wide"
+  const renderInputBar = () => (
+    /* Length adjusted to max-w-2xl for a compact, Gemini-like footprint */
+    <div className="w-full max-w-2xl mt-10 px-4 flex justify-center">
+      <div className="w-full bg-[#13171e] border border-slate-800/90 rounded-2xl flex items-center gap-4 pl-6 pr-3 py-2.5 shadow-2xl transition-all duration-300 ease-in-out focus-within:border-emerald-500/50 focus-within:ring-4 focus-within:ring-emerald-500/5 focus-within:shadow-[0_0_40px_rgba(16,185,129,0.05)] hover:border-slate-700/80">
+        
+        <div className="relative flex items-center shrink-0 group">
+          <select
+            value={selectedOption}
+            onChange={(e) => setSelectedOption(e.target.value)}
+            className="appearance-none bg-transparent font-bold border-r border-slate-800 pr-7 pl-1 py-1 text-xs text-slate-400 group-hover:text-slate-100 cursor-pointer outline-none transition-colors duration-300 ease-in-out"
           >
-            {isSidebarOpen ? '◀ Hide Menu' : '▶ Show Menu'}
-          </button>
-          
-          {/* Futuristic Micro-Orbit Neon Branding Ring */}
-          <div className="relative flex items-center justify-center w-10 h-10">
-            <motion.div 
-              className="absolute inset-0 rounded-full border-2 border-dashed border-[#00c48d]/40"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
-            />
-            <motion.div 
-              className="absolute inset-1 rounded-full border border-dotted border-purple-500/60"
-              animate={{ rotate: -360 }}
-              transition={{ repeat: Infinity, duration: 6, ease: "linear" }}
-            />
-            <img 
-              src={logoImg} 
-              alt="Logo" 
-              className="w-6 h-6 rounded-full object-cover z-10 shadow-[0_0_20px_rgba(0,196,141,0.6)] border border-[#00c48d]/30" 
-            />
-          </div>
-
-          {viewState === 'chatting' && (
-            <div className="flex items-center border-l border-slate-800/60 pl-4 hidden sm:flex">
-              <span className="text-xs font-black text-[#00c48d] px-3 py-1 rounded-lg bg-[#00c48d]/10 border border-[#00c48d]/20 tracking-wide shadow-[0_0_15px_rgba(0,196,141,0.05)]">
-                {selectedOption}
-              </span>
-            </div>
-          )}
+            {/* Added system-level dark background and dark text colors to keep options visible inside native dropdown bounds */}
+            <option className="bg-[#13171e] text-slate-200" value="English to Garhwali">English to Garhwali</option>
+            <option className="bg-[#13171e] text-slate-200" value="Garhwali to English">Garhwali to English</option>
+            <option className="bg-[#13171e] text-slate-200" value="Text to Speech">Text to Speech</option>
+            <option className="bg-[#13171e] text-slate-200" value="Speech to Text">Speech to Text</option>
+          </select>
+          <IoChevronDown className="pointer-events-none absolute right-2.5 text-[10px] text-slate-500 group-hover:text-slate-200 transition-colors duration-300" />
         </div>
 
-        <div className="flex items-center gap-4">
-          {viewState === 'chatting' && (
-            <select
-              className="text-xs px-3 py-2 bg-slate-950/60 border border-slate-800/60 rounded-xl text-slate-200 outline-none cursor-pointer focus:border-[#00c48d]/50 transition-all font-semibold"
-              value={selectedOption}
-              onChange={(e) => setSelectedOption(e.target.value)}
-            >
-              <option value="English to Garhwali">English to Garhwali</option>
-              <option value="Garhwali to English">Garhwali to English</option>
-              <option value="Text to Speech">Text to Speech</option>
-              <option value="Speech to Text">Speech to Text</option>
-            </select>
-          )}
-          <button className="p-2 text-slate-400 hover:text-slate-200 relative bg-slate-950/40 rounded-xl border border-slate-800/50 transition-colors">
-            <span className="text-xs">🔔</span>
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#00c48d] rounded-full animate-ping"></span>
-          </button>
-          <button className="text-xs font-bold px-4 py-2 rounded-xl border border-[#00c48d]/30 bg-[#00c48d]/10 text-[#00c48d] hover:bg-[#00c48d] hover:text-slate-950 transition-all">
-            Sign In
-          </button>
-        </div>
-      </header>
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Ask anything..."
+          className="flex-1 bg-transparent outline-none text-sm text-slate-100 placeholder-slate-600 px-1 transition-all"
+        />
 
-      {/* Main Container Viewport Workspace Frame */}
-      <div className="flex-1 overflow-hidden w-full relative z-10 bg-transparent">
+        <div className="flex items-center gap-2 shrink-0">
+          <motion.button 
+            whileHover={{ scale: 1.05, backgroundColor: '#1c212b', borderColor: '#475569' }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="p-2 rounded-xl bg-slate-800/30 text-slate-400 hover:text-slate-100 border border-slate-800/40 transition-all duration-300 cursor-pointer"
+          >
+            <FaMicrophone className="text-xs" />
+          </motion.button>
+
+          <motion.button
+            onClick={handleSendMessage}
+            disabled={!inputText.trim()}
+            whileHover={inputText.trim() ? { scale: 1.05, boxShadow: "0 0 20px rgba(0, 196, 141, 0.3)" } : {}}
+            whileTap={inputText.trim() ? { scale: 0.95 } : {}}
+            transition={{ duration: 0.2 }}
+            className={`p-2 rounded-xl transition-all duration-300 cursor-pointer ${
+              inputText.trim()
+                ? 'bg-[#00c48d] text-slate-950 hover:bg-[#00e0a1]'
+                : 'bg-slate-800/40 text-slate-600 cursor-not-allowed'
+            }`}
+          >
+            <IoSend className="text-xs" />
+          </motion.button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full flex-1 h-full flex flex-col relative bg-[#0c0f14] overflow-hidden transition-colors duration-500 ease-in-out">
+      <div className="w-full bg-gradient-to-r from-[#0f131a] to-[#0d1117] border-b border-slate-900 h-20 flex items-center justify-between px-8 z-20 relative shadow-lg">
+        <div className="flex items-center gap-6">
+          <AnimatePresence>
+            {!isSidebarOpen && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.22, ease: 'easeInOut' }}
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2.5 rounded-xl bg-[#13171e] hover:bg-[#1c212b] border border-slate-800 text-slate-400 hover:text-slate-100 shadow-xl transition-all duration-300 cursor-pointer"
+                whileHover={{ scale: 1.08, borderColor: '#475569', boxShadow: "0 0 15px rgba(255,255,255,0.03)" }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <FaBars className="text-xs" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+
+          <motion.div 
+            className="flex items-center gap-3 select-none px-2 py-1 rounded-xl transition-all duration-300 cursor-default"
+            whileHover={{ scale: 1.02 }}
+          >
+            <span className="text-xl font-black bg-gradient-to-r from-[#00c48d] via-[#22d3ee] to-[#8b5cf6] bg-clip-text text-transparent tracking-wider filter drop-shadow-[0_2px_10px_rgba(0,196,141,0.15)]">
+              <span className="font-sans mr-1.5">मि</span> Garhwali
+            </span>
+          </motion.div>
+        </div>
+
+        <div>
+          <motion.button 
+            whileHover={{ scale: 1.04, backgroundColor: 'rgba(0, 196, 141, 0.12)', borderColor: '#00c48d', boxShadow: '0 0 20px rgba(0, 196, 141, 0.15)' }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ duration: 0.25 }}
+            className="px-6 py-2 rounded-xl text-xs font-bold border border-slate-800 text-[#00c48d] bg-slate-900/40 tracking-wider transition-all duration-300 cursor-pointer"
+          >
+            About Us
+          </motion.button>
+        </div>
+      </div>
+
+      <div className="w-full flex-1 overflow-hidden relative z-10 flex flex-col items-center">
         <AnimatePresence mode="wait">
-          {viewState === 'welcome' ? (
-            <WelcomeView onStartChat={handleStartChat} />
+          {safeMessages.length === 0 ? (
+            <motion.div
+              key="welcome-state"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: 'easeInOut' }}
+              className="w-full h-full flex flex-col justify-center items-center px-6 pb-16"
+            >
+              <WelcomeView subGreeting={subGreeting} />
+              {renderInputBar()}
+            </motion.div>
           ) : (
-            <div className="h-full pb-36 bg-transparent">
-              <ChatArea messages={messages} isLoading={isLoading} />
-            </div>
+            <motion.div
+              key="chat-state"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="h-full w-full flex flex-col justify-between pb-8"
+            >
+              <ChatArea messages={safeMessages} isLoading={isLoading} />
+              <div className="w-full flex flex-col items-center">
+                {renderInputBar()}
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      {/* Floating Modern Chat Entry Deck */}
-      {viewState === 'chatting' && (
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#070b12] via-[#070b12]/95 to-transparent pointer-events-none z-20">
-          <div className="w-full max-w-3xl mx-auto bg-[#0c1220]/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] flex items-center gap-3 p-2.5 pointer-events-auto focus-within:border-[#00c48d]/50 focus-within:shadow-[0_0_35px_rgba(0,196,141,0.06)] transition-all box-border">
-            <input
-              type="text"
-              className="flex-1 bg-transparent py-4 px-4 text-sm text-slate-100 outline-none placeholder-slate-500 font-semibold tracking-wide"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={`Ask Mi-Garhwali AI (${selectedOption.toLowerCase()})...`}
-            />
-            <motion.button
-              className={`text-sm px-7 py-4 rounded-xl font-black tracking-wide transition-all ${
-                inputText.trim() === '' 
-                  ? 'bg-slate-800/40 text-slate-500 cursor-not-allowed border border-transparent' 
-                  : 'bg-[#00c48d] text-slate-950 hover:bg-[#00e0a1] shadow-lg shadow-[#00c48d]/20'
-              }`}
-              whileHover={inputText.trim() !== '' ? { scale: 1.02 } : {}}
-              whileTap={inputText.trim() !== '' ? { scale: 0.98 } : {}}
-              onClick={handleSendMessage}
-              disabled={inputText.trim() === ''}
-            >
-              Send
-            </motion.button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
