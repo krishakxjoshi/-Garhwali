@@ -73,7 +73,12 @@ function App() {
           onNavigateAbout={() => setCurrentView('about')}
         />
       ) : (
-        <AboutUsView onBack={() => setCurrentView('chat')} />
+        /* Passed sidebar state handlers down to the About Us view layer */
+        <AboutUsView 
+          onBack={() => setCurrentView('chat')} 
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
       )}
 
       <AnimatePresence>

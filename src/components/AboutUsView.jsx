@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { HiOutlineLanguage, HiOutlineCpuChip, HiOutlineShieldCheck, HiOutlineGlobeAlt, HiOutlineSquaresPlus } from 'react-icons/hi2';
 import { HiOutlineDatabase } from 'react-icons/hi';
 
-const AboutUsView = ({ onBack }) => {
+const AboutUsView = ({ onBack, isSidebarOpen, setIsSidebarOpen }) => {
   const cardVariants = {
     hover: {
       y: -6,
@@ -17,6 +17,20 @@ const AboutUsView = ({ onBack }) => {
 
   return (
     <div className="flex-1 h-screen overflow-y-auto bg-[#0c0f14] text-slate-100 p-8 custom-chat-scroll relative selection:bg-emerald-500/20">
+      
+      {/* Sidebar Layout Activation Toggle - Only displays when sidebar layout framework is collapsed */}
+      {!isSidebarOpen && (
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="absolute top-6 left-6 w-10 h-10 flex items-center justify-center rounded-xl bg-[#13171e] border border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all duration-200 cursor-pointer z-20"
+          title="Open Sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15m-12-15h18c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125H3.375A1.125 1.125 0 0 1 2.25 17.625V5.625C2.25 5.004 2.754 4.5 3.375 4.5Z" />
+          </svg>
+        </button>
+      )}
+
       <div className="max-w-4xl mx-auto py-6">
         <motion.button
           onClick={onBack}

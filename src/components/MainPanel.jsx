@@ -16,10 +16,12 @@ const MainPanel = ({ messages = [], setMessages, currentUser, isSidebarOpen, set
 
   useEffect(() => {
     const dynamicPhrases = [
-      'How can I help you today?',
-      'What would you like to translate or discover today?',
-      'Explore the depth of the Garhwali language with me.',
-      'Bring your text or queries; let’s map them out beautifully.'
+      "How can I assist you with your translations today?",
+      "What's on your mind? Let’s explore the Garhwali language together.",
+      "I'm here to help you translate, learn, and discover.",
+      "Let’s dive into language discovery—where should we begin?",
+      "Ready to translate? Tell me what you need.",
+      "Ask me anything to start our conversation."
     ];
     setSubGreeting(dynamicPhrases[Math.floor(Math.random() * dynamicPhrases.length)]);
   }, [safeMessages.length]);
