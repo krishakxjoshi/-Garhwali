@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import MainPanel from './components/MainPanel';
+import AboutUsView from './components/AboutUsView';
+import AuthView from './components/AuthView';
 import { AnimatePresence } from 'framer-motion';
 
 function App() {
-  const [history, setHistory] = useState([
-    { id: 'h1', text: 'How to say welcome?' },
-    { id: 'h2', text: 'Translate: Good morning' }
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [currentView, setCurrentView] = useState('chat'); // 'chat' | 'about'
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const [messages, setMessages] = useState([]); // Must initialize as an empty array, not undefined
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  // Persistent User state management
+  const [registeredUsers, setRegisteredUsers] = useState(() => {
+    const saved = localStorage.getItem('garhwali_users');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  // Default state changed to false to load hidden/toggled off out of the box
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('garhwali_active_session');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     const savedState = localStorage.getItem('sidebar_open');
     return savedState !== null ? JSON.parse(savedState) : false;
@@ -22,24 +30,24 @@ function App() {
     localStorage.setItem('sidebar_open', JSON.stringify(isSidebarOpen));
   }, [isSidebarOpen]);
 
+  useEffect(() => {
+    localStorage.setItem('garhwali_users', JSON.stringify(registeredUsers));
+  }, [registeredUsers]);
+
   const handleNewChat = () => {
     setMessages([]);
   };
 
-  const handleHistoryItemClick = (item) => {
-    setMessages([
-      {
-        id: Date.now(),
-        sender: 'user',
-        text: item.text,
-        mode: 'English to Garhwali'
-      },
-      {
-        id: Date.now() + 1,
-        sender: 'bot',
-        text: `Loaded archive context for prompt: "${item.text}"`
-      }
-    ]);
+  const handleSignInSuccess = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('garhwali_active_session', JSON.stringify(user));
+    setShowAuthModal(false);
+  };
+
+  const handleSignOut = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('garhwali_active_session');
+    setCurrentView('chat');
   };
 
   return (
@@ -48,20 +56,41 @@ function App() {
         <Sidebar
           isOpen={isSidebarOpen}
           onNewChat={handleNewChat}
-          onHistoryItemClick={handleHistoryItemClick}
-          history={history}
-          isLoggedIn={isLoggedIn}
+          currentUser={currentUser}
+          onSignOut={handleSignOut}
+          onSignInClick={() => setShowAuthModal(true)}
           setIsSidebarOpen={setIsSidebarOpen}
         />
       </AnimatePresence>
 
-      <MainPanel
-        messages={messages}
-        setMessages={setMessages}
-        setHistory={setHistory}
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
+      {currentView === 'chat' ? (
+        <MainPanel
+          messages={messages}
+          setMessages={setMessages}
+          currentUser={currentUser}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          onNavigateAbout={() => setCurrentView('about')}
+        />
+      ) : (
+        /* Passed sidebar state handlers down to the About Us view layer */
+        <AboutUsView 
+          onBack={() => setCurrentView('chat')} 
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
+      )}
+
+      <AnimatePresence>
+        {showAuthModal && (
+          <AuthView 
+            registeredUsers={registeredUsers}
+            setRegisteredUsers={setRegisteredUsers}
+            onAuthSuccess={handleSignInSuccess}
+            onClose={() => setShowAuthModal(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
