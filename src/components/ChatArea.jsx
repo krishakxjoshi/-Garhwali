@@ -11,26 +11,23 @@ const ChatArea = ({ messages, isLoading }) => {
   }, [messages, isLoading]);
 
   return (
-    /* Layout limits scaled up to max-w-6xl with increased padding for 100% zoom visibility */
-    <div ref={scrollRef} className="flex-1 overflow-y-auto px-10 py-8 space-y-8 max-w-6xl mx-auto w-full custom-chat-scroll">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto px-10 py-8 space-y-8 max-w-6xl mx-auto w-full custom-chat-scroll bg-[#0f0a1c]">
       {messages.map((msg) => (
         <div key={msg.id} className={`flex w-full ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
           <div className={`max-w-4xl rounded-2xl px-6 py-4 text-base shadow-xl transition-all duration-300 transform hover:scale-[1.01] hover:shadow-2xl ${
             msg.sender === 'user'
               ? 'bg-[#00c48d] text-slate-950 font-medium rounded-tr-none border border-emerald-400/30 hover:bg-[#00d69a]'
-              : 'bg-[#13171e] text-slate-200 border border-slate-800/80 rounded-tl-none hover:border-slate-700/80'
+              : 'bg-[#17112a] text-slate-200 border border-purple-950/40 rounded-tl-none hover:border-purple-900/40'
           }`}>
             {msg.text}
           </div>
         </div>
       ))}
 
-      {/* Modern Ambient Neural Intelligence Loading Grid */}
       {isLoading && (
         <div className="flex w-full justify-start items-start gap-4 pt-4">
-          <div className="w-full max-w-xl bg-gradient-to-br from-[#12161f] via-[#0f121a] to-[#0a0d14] p-6 rounded-2xl border border-slate-800/80 shadow-2xl relative overflow-hidden group transition-all duration-300 hover:border-slate-700/80">
+          <div className="w-full max-w-xl bg-gradient-to-br from-[#17112a] via-[#120d22] to-[#0d0918] p-6 rounded-2xl border border-purple-950/40 shadow-2xl relative overflow-hidden group transition-all duration-300 hover:border-purple-900/40">
             
-            {/* Blurry Background Chromatic Glow */}
             <div className="absolute -inset-10 bg-gradient-to-r from-purple-600/10 via-[#00c48d]/10 to-cyan-500/10 blur-xl opacity-70 animate-pulse pointer-events-none" />
 
             <div className="relative z-10 flex flex-col gap-5">
@@ -45,7 +42,6 @@ const ChatArea = ({ messages, isLoading }) => {
                   </span>
                 </div>
 
-                {/* Micro Digital Heartbeat Sparkles */}
                 <div className="flex items-center gap-1.5">
                   {[0, 1, 2].map((i) => (
                     <motion.div
@@ -66,16 +62,15 @@ const ChatArea = ({ messages, isLoading }) => {
                 </div>
               </div>
 
-              {/* Multi-tier Organic Fluid Shimmer Lines */}
               <div className="space-y-3">
-                <div className="relative h-2.5 w-full bg-slate-900/60 rounded-md overflow-hidden border border-slate-800/40">
+                <div className="relative h-2.5 w-full bg-purple-950/20 rounded-md overflow-hidden border border-purple-950/30">
                   <motion.div 
                     animate={{ x: ['-100%', '100%'] }}
                     transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00c48d]/25 via-cyan-400/15 to-transparent w-full"
                   />
                 </div>
-                <div className="relative h-2.5 w-3/4 bg-slate-900/60 rounded-md overflow-hidden border border-slate-800/40">
+                <div className="relative h-2.5 w-3/4 bg-purple-950/20 rounded-md overflow-hidden border border-purple-950/30">
                   <motion.div 
                     animate={{ x: ['-100%', '100%'] }}
                     transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut', delay: 0.25 }}

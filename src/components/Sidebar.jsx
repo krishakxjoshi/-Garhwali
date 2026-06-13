@@ -6,6 +6,7 @@ import { VscSignOut, VscSignIn } from 'react-icons/vsc';
 
 const Sidebar = ({ isOpen, onNewChat, currentUser, onSignOut, onSignInClick, setIsSidebarOpen }) => {
   const [isHoveredOpen, setIsHoveredOpen] = useState(false);
+  const isRealUser = currentUser && !currentUser.isGuest;
 
   return (
     <AnimatePresence mode="popLayout">
@@ -17,12 +18,11 @@ const Sidebar = ({ isOpen, onNewChat, currentUser, onSignOut, onSignInClick, set
           transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
           className="h-full bg-[#0d1117] border-r border-slate-900/90 flex flex-col justify-between p-4 shrink-0 overflow-hidden z-30 select-none relative"
         >
-          {/* Strict rigid width wrapper prevents child nodes from shrinking or jumping when the sidebar opens/closes */}
           <div className="w-[248px] flex flex-col h-full justify-between shrink-0">
             <div className="flex flex-col w-full">
               <div className="flex items-center justify-between p-1.5 mb-2">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  {currentUser ? 'Active Profile' : 'Navigation'}
+                  {isRealUser ? 'Active Profile' : 'Navigation'}
                 </span>
                 <motion.button
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -41,7 +41,7 @@ const Sidebar = ({ isOpen, onNewChat, currentUser, onSignOut, onSignInClick, set
                 </motion.button>
               </div>
 
-              {currentUser ? (
+              {isRealUser ? (
                 <div className="flex flex-col gap-2.5 mb-4">
                   <div className="flex items-center justify-between p-2.5 rounded-xl hover:bg-[#161b22] border border-transparent hover:border-slate-800/60 transition-all duration-300 ease-in-out group">
                     <div className="flex items-center gap-3 overflow-hidden">
@@ -71,12 +71,17 @@ const Sidebar = ({ isOpen, onNewChat, currentUser, onSignOut, onSignInClick, set
                   </motion.button>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2.5 mb-4">
+                /* Redesigned Seamless Guest UI Panel Component to match image_de08e0.png layout */
+                <div className="flex flex-col gap-2 mb-4 p-2.5 bg-[#13171e] border border-slate-800/60 rounded-xl relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-amber-500/80 opacity-70" />
+                  <div className="flex items-center gap-2 pl-1.5">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Guest Mode Enabled</span>
+                  </div>
                   <motion.button
                     onClick={onSignInClick}
-                    whileHover={{ backgroundColor: '#161b22', borderColor: '#475569', scale: 1.01 }}
+                    whileHover={{ backgroundColor: '#1c212b', borderColor: '#475569' }}
                     whileTap={{ scale: 0.99 }}
-                    className="w-full bg-[#11141a] text-emerald-400 text-xs font-bold border border-slate-800/80 transition-all duration-300 rounded-xl py-2.5 flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-[#0d1117] text-slate-200 hover:text-white text-xs font-semibold border border-slate-800 transition-all duration-200 rounded-lg py-2 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <VscSignIn className="text-sm text-emerald-400" />
                     <span>Sign In / Register</span>
