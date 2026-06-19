@@ -58,8 +58,10 @@ const MainPanel = ({ messages = [], setMessages, currentUser, isSidebarOpen, set
   };
 
   return (
-    <motion.div layout className="w-full flex-1 h-full flex flex-col relative bg-[#0c0f14] overflow-hidden">
-      <div className="w-full bg-gradient-to-r from-[#0f131a] to-[#0d1117] border-b border-slate-900 h-20 flex items-center justify-between px-8 z-20 relative shadow-lg">
+    <motion.div layout className="w-full flex-1 h-full flex flex-col relative bg-transparent overflow-hidden">
+      
+      {/* Header Panel */}
+      <div className="w-full bg-[#150e26]/20 backdrop-blur-md border-b border-purple-950/10 h-16 flex items-center justify-between px-8 z-20 relative shadow-md">
         <div className="flex items-center gap-4">
           <AnimatePresence mode="popLayout">
             {!isSidebarOpen && (
@@ -71,17 +73,16 @@ const MainPanel = ({ messages = [], setMessages, currentUser, isSidebarOpen, set
                 onMouseEnter={() => setIsHoveredOpen(true)}
                 onMouseLeave={() => setIsHoveredOpen(false)}
                 onClick={() => setIsSidebarOpen(true)}
-                className="p-2.5 rounded-xl bg-[#13171e] hover:bg-[#1c212b] border border-slate-800 text-slate-400 hover:text-slate-100 shadow-xl transition-all duration-300 cursor-pointer flex items-center justify-center"
+                className="p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/30 text-slate-400 hover:text-slate-100 shadow-md transition-all duration-300 cursor-pointer flex items-center justify-center"
               >
                 {isHoveredOpen ? <LuPanelLeftOpen className="text-sm text-emerald-400" /> : <LuPanelLeftClose className="text-sm" />}
               </motion.button>
             )}
           </AnimatePresence>
 
-          {/* Fixed Word Spacing to be compact exactly like the chat interface logo */}
           <div className="flex items-center gap-x-1 select-none tracking-tight font-sans">
-            <span className="text-xl font-bold text-[#00c48d]">मि</span>
-            <span className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#00c48d] via-[#a855f7] to-[#ec4899] ml-0.5">
+            <span className="text-lg font-bold text-[#00c48d]">मि</span>
+            <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#00c48d] via-[#a855f7] to-[#ec4899] ml-0.5">
               Garhwali
             </span>
           </div>
@@ -89,29 +90,38 @@ const MainPanel = ({ messages = [], setMessages, currentUser, isSidebarOpen, set
 
         <motion.button
           onClick={onNavigateAbout}
-          whileHover={{ scale: 1.04, backgroundColor: 'rgba(0, 196, 141, 0.12)', borderColor: '#00c48d' }}
-          whileTap={{ scale: 0.96 }}
-          className="px-6 py-2 rounded-xl text-xs font-bold border border-slate-800 text-[#00c48d] bg-slate-900/40 tracking-wider transition-all cursor-pointer"
+          whileHover={{ scale: 1.02, backgroundColor: 'rgba(0, 196, 141, 0.1)', borderColor: '#00c48d' }}
+          whileTap={{ scale: 0.98 }}
+          className="px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-800 text-[#00c48d] bg-slate-900/40 tracking-wider transition-all cursor-pointer"
         >
           About Us
         </motion.button>
       </div>
 
-      <div className="w-full flex-1 overflow-hidden relative z-10 flex flex-col items-center">
+      {/* Main Structural Container Content Block Grid mapping layout height logic */}
+      <div className="w-full flex-1 overflow-hidden relative z-10 flex flex-col justify-center items-center">
         <AnimatePresence mode="wait">
           {safeMessages.length === 0 ? (
-            <motion.div key="welcome" className="w-full h-full flex flex-col justify-center items-center px-6 pb-16">
+            <motion.div 
+              key="welcome" 
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="w-full max-w-2xl flex flex-col justify-center items-center px-4 space-y-6"
+            >
+              {/* Dynamic Interface Logo Rendering Grid View Component */}
               <WelcomeView subGreeting={subGreeting} currentUser={currentUser} />
 
-              <div className="w-full max-w-2xl mt-10 px-4 flex justify-center">
+              {/* Compressed Search Bar Wrapper block */}
+              <div className="w-full flex justify-center">
                 <motion.div
                   whileHover={{
-                    scale: 1.005,
-                    borderColor: 'rgba(0, 196, 141, 0.35)',
-                    boxShadow: '0 20px 30px -10px rgba(0,0,0,0.7), 0 0 15px rgba(0, 196, 141, 0.03)'
+                    scale: 1.002,
+                    borderColor: 'rgba(0, 196, 141, 0.3)',
+                    boxShadow: '0 20px 30px -10px rgba(0,0,0,0.7)'
                   }}
                   transition={{ duration: 0.2 }}
-                  className="w-full bg-[#13171e] hover:bg-[#161b26] border border-slate-800/90 rounded-2xl flex items-center gap-4 pl-6 pr-3 py-2.5 shadow-2xl focus-within:border-emerald-500/50 focus-within:bg-[#161b26] transition-all duration-300"
+                  className="w-full bg-slate-900/80 hover:bg-slate-900 border border-slate-800/80 rounded-2xl flex items-center gap-4 pl-5 pr-2.5 py-2.5 transition-all duration-300 focus-within:border-[#00c48d]/50 focus-within:bg-slate-900"
                 >
                   <input
                     type="text"
@@ -119,13 +129,13 @@ const MainPanel = ({ messages = [], setMessages, currentUser, isSidebarOpen, set
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Ask anything..."
-                    className="flex-1 bg-transparent outline-none text-sm text-slate-100 placeholder-slate-600"
+                    className="flex-1 bg-transparent outline-none text-sm text-slate-100 placeholder-slate-500"
                   />
                   <motion.button
                     onClick={handleSendMessage}
                     disabled={!inputText.trim()}
-                    whileHover={inputText.trim() ? { scale: 1.05 } : {}}
-                    whileTap={inputText.trim() ? { scale: 0.95 } : {}}
+                    whileHover={inputText.trim() ? { scale: 1.02 } : {}}
+                    whileTap={inputText.trim() ? { scale: 0.98 } : {}}
                     className={`p-2 rounded-xl transition-all ${inputText.trim() ? 'bg-[#00c48d] text-slate-950 cursor-pointer' : 'bg-slate-800/40 text-slate-600'}`}
                   >
                     <IoSend className="text-xs" />
@@ -134,19 +144,19 @@ const MainPanel = ({ messages = [], setMessages, currentUser, isSidebarOpen, set
               </div>
             </motion.div>
           ) : (
-            <motion.div key="chat" className="h-full w-full flex flex-col justify-between pb-8">
+            <motion.div key="chat" className="h-full w-full flex flex-col justify-between pb-6">
               <ChatArea messages={safeMessages} isLoading={isLoading} />
 
               <div className="w-full flex flex-col items-center">
-                <div className="w-full max-w-2xl mt-4 px-4 flex justify-center">
+                <div className="w-full max-w-2xl px-4 flex justify-center">
                   <motion.div
                     whileHover={{
-                      scale: 1.005,
-                      borderColor: 'rgba(0, 196, 141, 0.35)',
-                      boxShadow: '0 20px 30px -10px rgba(0,0,0,0.7), 0 0 15px rgba(0, 196, 141, 0.03)'
+                      scale: 1.002,
+                      borderColor: 'rgba(0, 196, 141, 0.3)',
+                      boxShadow: '0 20px 30px -10px rgba(0,0,0,0.7)'
                     }}
                     transition={{ duration: 0.2 }}
-                    className="w-full bg-[#13171e] hover:bg-[#161b26] border border-slate-800/90 rounded-2xl flex items-center gap-4 pl-6 pr-3 py-2.5 shadow-2xl focus-within:border-emerald-500/50 focus-within:bg-[#161b26] transition-all duration-300"
+                    className="w-full bg-slate-900/80 hover:bg-slate-900 border border-slate-800/80 rounded-2xl flex items-center gap-4 pl-5 pr-2.5 py-2.5 transition-all duration-300 focus-within:border-[#00c48d]/50 focus-within:bg-slate-900"
                   >
                     <input
                       ref={inputRef}
@@ -155,13 +165,13 @@ const MainPanel = ({ messages = [], setMessages, currentUser, isSidebarOpen, set
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="Ask anything..."
-                      className="flex-1 bg-transparent outline-none text-sm text-slate-100 placeholder-slate-600"
+                      className="flex-1 bg-transparent outline-none text-sm text-slate-100 placeholder-slate-500"
                     />
                     <motion.button
                       onClick={handleSendMessage}
                       disabled={!inputText.trim()}
-                      whileHover={inputText.trim() ? { scale: 1.05 } : {}}
-                      whileTap={inputText.trim() ? { scale: 0.95 } : {}}
+                      whileHover={inputText.trim() ? { scale: 1.02 } : {}}
+                      whileTap={inputText.trim() ? { scale: 0.98 } : {}}
                       className={`p-2 rounded-xl transition-all ${inputText.trim() ? 'bg-[#00c48d] text-slate-950 cursor-pointer' : 'bg-slate-800/40 text-slate-600'}`}
                     >
                       <IoSend className="text-xs" />

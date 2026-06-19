@@ -10,12 +10,6 @@ function App() {
   const [currentView, setCurrentView] = useState('chat'); // 'chat' | 'about'
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Persistent User state management
-  const [registeredUsers, setRegisteredUsers] = useState(() => {
-    const saved = localStorage.getItem('garhwali_users');
-    return saved ? JSON.parse(saved) : [];
-  });
-
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('garhwali_active_session');
     return saved ? JSON.parse(saved) : null;
@@ -30,10 +24,6 @@ function App() {
     localStorage.setItem('sidebar_open', JSON.stringify(isSidebarOpen));
   }, [isSidebarOpen]);
 
-  useEffect(() => {
-    localStorage.setItem('garhwali_users', JSON.stringify(registeredUsers));
-  }, [registeredUsers]);
-
   const handleNewChat = () => {
     setMessages([]);
   };
@@ -47,50 +37,50 @@ function App() {
   const handleSignOut = () => {
     setCurrentUser(null);
     localStorage.removeItem('garhwali_active_session');
+    localStorage.removeItem('auth_token');
     setCurrentView('chat');
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#0c0f14] flex text-slate-100 font-sans antialiased relative">
-      <AnimatePresence mode="wait">
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onNewChat={handleNewChat}
-          currentUser={currentUser}
-          onSignOut={handleSignOut}
-          onSignInClick={() => setShowAuthModal(true)}
-          setIsSidebarOpen={setIsSidebarOpen}
-        />
-      </AnimatePresence>
+    <div className="h-screen w-screen overflow-hidden bg-gradient-to-tr from-[#0b0714] via-[#0f0a1c] to-[#150e26] flex text-slate-100 font-sans antialiased relative">
+      <div className="h-screen w-screen overflow-hidden bg-[#0f0a1c] flex text-slate-100 font-sans antialiased relative">
+        <AnimatePresence mode="wait">
+          <Sidebar
+            isOpen={isSidebarOpen}
+            onNewChat={handleNewChat}
+            currentUser={currentUser}
+            onSignOut={handleSignOut}
+            onSignInClick={() => setShowAuthModal(true)}
+            setIsSidebarOpen={setIsSidebarOpen}
+          />
+        </AnimatePresence>
 
-      {currentView === 'chat' ? (
-        <MainPanel
-          messages={messages}
-          setMessages={setMessages}
-          currentUser={currentUser}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          onNavigateAbout={() => setCurrentView('about')}
-        />
-      ) : (
-        /* Passed sidebar state handlers down to the About Us view layer */
-        <AboutUsView 
-          onBack={() => setCurrentView('chat')} 
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-        />
-      )}
-
-      <AnimatePresence>
-        {showAuthModal && (
-          <AuthView 
-            registeredUsers={registeredUsers}
-            setRegisteredUsers={setRegisteredUsers}
-            onAuthSuccess={handleSignInSuccess}
-            onClose={() => setShowAuthModal(false)}
+        {currentView === 'chat' ? (
+          <MainPanel
+            messages={messages}
+            setMessages={setMessages}
+            currentUser={currentUser}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            onNavigateAbout={() => setCurrentView('about')}
+          />
+        ) : (
+          <AboutUsView
+            onBack={() => setCurrentView('chat')}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
           />
         )}
-      </AnimatePresence>
+
+        <AnimatePresence>
+          {showAuthModal && (
+            <AuthView
+              onAuthSuccess={handleSignInSuccess}
+              onClose={() => setShowAuthModal(false)}
+            />
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
